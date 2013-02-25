@@ -1,6 +1,10 @@
 #pragma once
 
 #include "ofMain.h"
+#include "hexapod.h"
+#include "ofxXmlSettings.h"
+#include "ofxUI.h"
+
 
 class testApp : public ofBaseApp{
 
@@ -18,5 +22,18 @@ class testApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+    
+     void cSystem();
+     ofEasyCam cam;
+     ofMaterial material;
+    ofLight light;
+    ofNode center;
+    
+    ofxUICanvas *gui;
+    void guiEvent(ofxUIEventArgs &e);
+    void exit();
+    
+    
+    vector<hexapod> animals;
 		
 };
