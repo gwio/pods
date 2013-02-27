@@ -12,10 +12,21 @@ public:
     // position of body
     ofVec3f bodyCenterPos;
     // translate position
-    ofVec3f transP;
-    ofPoint transPoint;
+    ofVec3f location;
     // rotation
     ofVec3f rotP;
+    //velocity
+    ofVec3f vel;
+    //accleration
+    ofVec3f acc;
+    
+    
+    ofVec3f current, previous;
+    
+    ofPoint transPoint;
+    //size
+    float scale;
+    float mass;
     
     //mesh description
     float lenTotal;
@@ -50,6 +61,9 @@ public:
     //Constructor
     hexapod();
     
+    
+    void addForce(ofVec3f);
+    
     void update();
     
     void initMeshPoints();
@@ -59,11 +73,12 @@ public:
     
     void draw();
     void drawNormals();
-  
+    void scaleMesh( float);
     
-    
+    void rotateToNormal(ofVec3f);
+    void attToCenter();
    
-    
+    void slowDown();
     
     
     void updateMeshRadiusX(vector<ofVec3f>* , vector<ofVec3f>* , vector<ofVec3f>*);
@@ -79,7 +94,7 @@ public:
    
     
             
-    
+    float farbe;
        
     
         

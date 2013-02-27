@@ -27,7 +27,7 @@ class testApp : public ofBaseApp{
      ofEasyCam cam;
      ofMaterial material;
     ofLight light;
-    ofNode center;
+    ofVec3f center;
     
     ofxUICanvas *gui;
     void guiEvent(ofxUIEventArgs &e);
@@ -35,5 +35,18 @@ class testApp : public ofBaseApp{
     
     
     vector<hexapod> animals;
+    
+    //forces
+    float noiseInc, noiseX, noiseY, noiseZ;
+   
+    
+    void updateWind();
+    
+    void attToCenter(vector<hexapod>*);
+    
+     void seperation(vector<hexapod>*);
+    
+        
+    ofVec3f wind;
 		
 };
