@@ -49,5 +49,7 @@ class testApp : public ofBaseApp{
     
     float windforce;
     ofVec3f wind;
+    
+    float globalSlow;
 		
 };

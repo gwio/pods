@@ -1,7 +1,7 @@
 #include "testApp.h"
 
 
-#define PODS 100
+#define PODS 50
 
 
 //--------------------------------------------------------------
@@ -13,31 +13,35 @@ void testApp::setup(){
     ofEnableAlphaBlending();
     ofEnableSmoothing();
     ofEnableBlendMode(ofBlendMode(OF_BLENDMODE_ALPHA));
-    material.setShininess(70);
-    material.setAmbientColor(30);
-    material.setDiffuseColor(130);
-    material.setSpecularColor(ofColor(111,111,111));
+    material.setShininess(10);
+    material.setAmbientColor(125);
+    material.setDiffuseColor(30);
+    material.setSpecularColor(ofColor(161,111,111));
     
     
     
     light.enable();
-   // light.setSpotlight();
-    
-    light.setAmbientColor(ofColor::fromHsb(170, 220, 50));
-    light.setDiffuseColor(ofColor(122,66,66));
+    light.setSpotlight();
+    light.setSpotlightCutOff(50);
+    light.setSpotConcentration(10);
+    light.setAmbientColor(ofColor::fromHsb(190, 240, 170));
+    light.setDiffuseColor(ofColor(33,55,55));
     light.setSpecularColor(ofColor(120,120,120));
-    light.setPosition(0,1200,0);
+    light.setPosition(0,800,0);
     
     
     light2.enable();
     
-    light2.setAmbientColor(ofColor::fromHsb(170, 220, 50));
-    light2.setDiffuseColor(ofColor(55,55,88));
-    light2.setSpecularColor(ofColor(120,120,120));
-    light2.setPosition(0,0,0);
+    light2.setAmbientColor(ofColor::fromHsb(140, 230, 130));
+    light2.setDiffuseColor(ofColor(44,44,77));
+    light2.setSpecularColor(ofColor(70,70,70));
+    light2.setPosition(0,-100,0);
     
     
-    cam.setFarClip(12000);
+    cam.setFarClip(20000);
+    cam.setNearClip(100);
+   // cam.setFov();
+   
     
     cam.setDistance(100);
     cam.setPosition(0, 0, +1000);
@@ -46,22 +50,51 @@ void testApp::setup(){
     
     
     center = ofVec3f(0,0,0);
-    
+    globalSlow = 1.0;
+    /*
+     Constructor defintion ;)
+     ofVec3f location_, ofVec3f startVel_, float bodyLen_, float bodyFrontH_, float bodyFrontW_,
+     float bodyBackW_, float bodyBackH_, float bodyToHeadDist_, float bodyToTailDist_, float headFrontDia_,
+     float headFrontDist_,float headLen_, float headFrontW_,
+     float headFrontH_, float headBackW_, float headBackH_,float tailBackDia_, float tailBackDist_,
+     float tailLen_, float tailFrontW_, float tailFrontH_,
+     float tailBackW_, float tailBackH_, float* globalSlow, float scale_, ofColor farbe_)   
+     */
     for (int i=0; i < PODS; i++) {
-        animals.push_back(hexapod());
-                  
-        int ran = int(ofRandom(3));
-        
-        if (ran<2) {
-        animals[i].scaleMesh( ofRandom(1)+0.5);
-        } else {
-            animals[i].scaleMesh( ofRandom(3.4)+ran);
-        }
-        
-        
-        // animals[i].initMeshPoints();
-        // animals[i].updateMesh();
-        
+        animals.push_back(hexapod(
+                ofVec3f(ofRandom(-200,200), ofRandom(-200,200), ofRandom(-200,200)),
+                ofVec3f( ofRandom(-3,3), ofRandom(-200,200) , ofRandom(-3,3)),
+                ofRandom(2,200),
+                ofRandom(2, 200),
+                ofRandom(2, 200),
+                ofRandom(2, 200),
+                ofRandom(2, 200),
+                
+                ofRandom(-15, 200),
+                ofRandom(-15, 200),
+                
+                ofRandom(2, 20),
+                ofRandom(-30, 60),
+                
+                ofRandom(2, 200),
+                ofRandom(2, 200),
+                ofRandom(2, 200),
+                ofRandom(2, 200),
+                ofRandom(2, 200),
+                
+                ofRandom(2, 20),
+                ofRandom(-30, 60),
+                
+                ofRandom(2, 200),
+                ofRandom(2, 200),
+                ofRandom(2, 200),
+                ofRandom(2, 200),
+                ofRandom(2, 200),
+                &globalSlow,
+                
+            1,
+                ofColor::fromHsb(ofRandom(255), 30, 222, 180)
+                ));
         
     }
     
@@ -155,10 +188,10 @@ void testApp::attToCenter(vector<hexapod>* tiere_) {
             dir - center;
         float distToCen = dir.length();
         
-        if (distToCen > 2000) {
+        if (distToCen > 1800) {
             dir.normalize();
             dir*=-1;
-            dir*=((distToCen-2000)*0.00019);
+            dir*=((distToCen-1800)*0.00019);
             tiere_->at(i).addForce(dir);
             
         }
@@ -175,12 +208,12 @@ void testApp::seperation(vector<hexapod>* tiere_) {
             if ( i != j) {
                 ofVec3f dir = tiere_->at(i).location;
                 dir-= tiere_->at(j).location;
-                float dia = ((tiere_->at(i).bodyLen) + (tiere_->at(j).bodyLen))*5000;
+                float dia = ((tiere_->at(i).lenTotal)  + ((tiere_->at(j).lenTotal))  )*6000;
                 float dist = dir.lengthSquared();
                 
-                if ( dist < 15000+dia) {
+                if ( dist < 125000+dia) {
                     
-                    float force = (((15000+dia)/ dist) -1) *0.018;
+                    float force = (((125000+dia)/ dist) -1) *0.005;
                     dir.normalize();
                     dir*=force;
                     tiere_->at(i).addForce(dir);
@@ -204,8 +237,7 @@ void testApp::draw(){
     ofColor a2 = ofColor::fromHsb(120, 180, 70);
     ofBackgroundGradient(a1 * 0.6, a2* 0.4);
     
-    
-    
+        
     cam.begin();
     // light.draw();
     // center.draw();
@@ -223,8 +255,8 @@ void testApp::draw(){
     string fpsStr = "fps: "+ofToString(ofGetFrameRate(), 2);
     ofDrawBitmapString(fpsStr, ofGetWidth()-100,100);
     
-    string windStr = "wind: "+ ofToString(wind.x);
-    ofDrawBitmapString(windStr, ofGetWidth()-100,200);
+   // string windStr = "wind: "+ ofToString(wind.x);
+   // ofDrawBitmapString(windStr, ofGetWidth()-100,200);
 }
 
 //--------------------------------------------------------------
@@ -525,10 +557,10 @@ void testApp::updateWind() {
     
 
     //updateWind
-    float t = ( ofGetElapsedTimef())*0.5 ;
+    float t = ( ofGetElapsedTimef())*0.1 ;
     
     wind.x = ofSignedNoise(t,0,0);
-    wind.y = ofSignedNoise(0,t,0);
+   wind.y = ofSignedNoise(0,t,0);
     wind.z = ofSignedNoise(0,0,t);
     
     wind*=windforce;
