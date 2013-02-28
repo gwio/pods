@@ -93,7 +93,7 @@ public:
     
    
     
-            
+    float velSlow;
     float farbe;
        
     

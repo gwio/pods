@@ -20,41 +20,41 @@ hexapod::hexapod() {
     transPoint.set(0,0,0);
     
     //______________________________________________________________________________ //body
-    bodyToHeadDia = 3;
-    bodyToHeadDist = 12;
+    bodyToHeadDia = ofRandom(2, 10);
+    bodyToHeadDist = ofRandom(2, 30);
     
-    bodyToTailDia = 2.5;
-    bodyToTailDist = 6;
+    bodyToTailDia = ofRandom(2, 10);
+    bodyToTailDist = ofRandom(3, 30);
     
-    bodyFrontW = 22;
-    bodyFrontH = 22;
+    bodyFrontW = ofRandom(10, 64);
+    bodyFrontH = ofRandom(10, 64);
     
-    bodyBackW = 12;
-    bodyBackH = 22;
+    bodyBackW = ofRandom(10, 64);
+    bodyBackH = ofRandom(10, 64);;
     
-    bodyLen = 30;
+    bodyLen = ofRandom(10, 100);
     
     
     //_______________________________________________________________________________ //head
-    headFrontW = 12;
-    headFrontH = 12;
+    headFrontW = ofRandom(10, 64);
+    headFrontH = ofRandom(10, 64);
     
-    headBackW = 12;
-    headBackH = 22;
+    headBackW = ofRandom(10, 64);
+    headBackH = ofRandom(10, 64);
     
-    headLen = 12;
+    headLen = ofRandom(10, 84);
     
     headOffset = (bodyLen/2) +(bodyToHeadDist) + (headLen/2);
     
     
     //_______________________________________________________________________ //tail
-    tailFrontW = 7;
-    tailFrontH = 7;
+    tailFrontW = ofRandom(10, 64);
+    tailFrontH = ofRandom(10, 64);
     
-    tailBackW = 11.5;
-    tailBackH = 11.5;
+    tailBackW = ofRandom(10, 64);
+    tailBackH = ofRandom(10, 64);
     
-    tailLen = 18;
+    tailLen = ofRandom(10, 108);
     
     tailOffset = (bodyLen/2) +(bodyToTailDist) + (tailLen/2);
     
@@ -70,7 +70,7 @@ hexapod::hexapod() {
     updateMesh();
     
     vel.x = ofRandom(-4,4);
-    vel.y = ofRandom(-4,4);
+     vel.y = ofRandom(-4,4);
     vel.z = ofRandom(-4,4);
     
     location.x = ofRandom(-100,100);
@@ -79,6 +79,7 @@ hexapod::hexapod() {
     mass =1;
     
     farbe = ofRandom(255);
+    velSlow = 1.0;
     
 }
 
@@ -122,7 +123,7 @@ void hexapod::update() {
     
     
     acc*=0;
-    //vel*=0.9;
+    vel*=velSlow;
 }
 
 void hexapod::initMeshPoints() {
@@ -895,9 +896,9 @@ void hexapod::setColors(ofMesh* mesh_) {
       
     for (int i = 0; i < mesh_->getNumVertices(); i+=3) {
       
-        mesh_->addColor( ofColor::fromHsb( farbe, 170, 215, 255)) ;
-          mesh_->addColor( ofColor::fromHsb( farbe, 170, 215, 255)) ;
-          mesh_->addColor( ofColor::fromHsb( farbe, 170, 215, 255)) ;
+        mesh_->addColor( ofColor::fromHsb( farbe, 55, 211, 212)) ;
+          mesh_->addColor( ofColor::fromHsb( farbe, 55, 211, 212)) ;
+          mesh_->addColor( ofColor::fromHsb( farbe, 55, 211, 212)) ;
     }
     
 }
@@ -1028,9 +1029,13 @@ void hexapod::draw() {
     
     
     
-    meshBody.drawFaces();
-    meshHead.drawFaces();
-    meshTail.drawFaces();
+  //  meshBody.drawFaces();
+  //  meshHead.drawFaces();
+   // meshTail.drawFaces();
+    
+   meshBody.drawWireframe();
+   meshHead.drawWireframe();
+    meshTail.drawWireframe();
     
     ofPopMatrix();
     
@@ -1103,11 +1108,15 @@ void hexapod::rotateToNormal(ofVec3f normal_) {
     
    // float aX = ofMap(rotAngle.x, 1, -1, -0.3, 0.3);
    // radiusXScale = aX;
-     float aY = -(PI/8)*rotation.y();
+    // float aY = ofMap(rotAngle.y, -1, 1, -PI/16, PI/16);
+    float aY = -(rotAngle.y* ofMap(rotAm, 0, 150, -PI/12, PI/12));
     radiusYScale = aY;
     
-    float aX = -(PI/8)*rotation.x();
+    float aX = -(rotAngle.x* ofMap(rotAm, 0, 150, PI/12, -PI/12));
     radiusXScale = aX;
+    
+  //  float aX = -(PI/8)*rotation.x();
+   // radiusXScale = aX;
 
     
     

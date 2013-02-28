@@ -27,6 +27,7 @@ class testApp : public ofBaseApp{
      ofEasyCam cam;
      ofMaterial material;
     ofLight light;
+    ofLight light2;
     ofVec3f center;
     
     ofxUICanvas *gui;
@@ -46,7 +47,7 @@ class testApp : public ofBaseApp{
     
      void seperation(vector<hexapod>*);
     
-        
+    float windforce;
     ofVec3f wind;
 		
 };
