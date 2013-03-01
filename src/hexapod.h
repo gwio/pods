@@ -20,7 +20,7 @@ public:
     //Constructor
     hexapod(ofVec3f,ofVec3f, float, float, float, float, float, float, float, float, float, float, float, float,
             float, float, float, float, float, float, float, float, float, float*, float, ofColor
-    );
+            );
     //----------------------------------------------
     
     // center of body
@@ -38,11 +38,10 @@ public:
     //accleration
     ofVec3f acc;
     float mass;
-    //for rotation - quaternion
-    ofVec3f previous;
+   
     
     //global Slowdown
-    float velSlow;
+    float* velSlow;
     
     
     //////////Form__________________________________
@@ -108,12 +107,12 @@ public:
     //motion______
     void updateMeshRadiusX(vector<ofVec3f>* , vector<ofVec3f>* , vector<ofVec3f>*);
     void updateMeshRadiusY(vector<ofVec3f>* , vector<ofVec3f>* , vector<ofVec3f>* );
-    void rotateToNormal(ofVec3f);
+    void rotateToNormal();
     void slowDown();
     void addForce(ofVec3f);
     
     ///experimental
     
     
-    };
+};
 #endif

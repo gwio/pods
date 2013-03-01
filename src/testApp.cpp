@@ -40,8 +40,8 @@ void testApp::setup(){
     
     cam.setFarClip(20000);
     cam.setNearClip(100);
-   // cam.setFov();
-   
+    // cam.setFov();
+    
     
     cam.setDistance(100);
     cam.setPosition(0, 0, +1000);
@@ -58,48 +58,59 @@ void testApp::setup(){
      float headFrontDist_,float headLen_, float headFrontW_,
      float headFrontH_, float headBackW_, float headBackH_,float tailBackDia_, float tailBackDist_,
      float tailLen_, float tailFrontW_, float tailFrontH_,
-     float tailBackW_, float tailBackH_, float* globalSlow, float scale_, ofColor farbe_)   
+     float tailBackW_, float tailBackH_, float* globalSlow, float scale_, ofColor farbe_)
      */
+    float randomScale;
     for (int i=0; i < PODS; i++) {
+        if ( i%10 == 0) {
+            randomScale = 2.2;
+        } else if (i%6 == 0){
+            randomScale = 0.2;
+            
+        } else {
+            
+            randomScale = 1;
+        }
+        
         animals.push_back(hexapod(
-                ofVec3f(ofRandom(-200,200), ofRandom(-200,200), ofRandom(-200,200)),
-                ofVec3f( ofRandom(-3,3), ofRandom(-200,200) , ofRandom(-3,3)),
-                ofRandom(2,200),
-                ofRandom(2, 200),
-                ofRandom(2, 200),
-                ofRandom(2, 200),
-                ofRandom(2, 200),
-                
-                ofRandom(-15, 200),
-                ofRandom(-15, 200),
-                
-                ofRandom(2, 20),
-                ofRandom(-30, 60),
-                
-                ofRandom(2, 200),
-                ofRandom(2, 200),
-                ofRandom(2, 200),
-                ofRandom(2, 200),
-                ofRandom(2, 200),
-                
-                ofRandom(2, 20),
-                ofRandom(-30, 60),
-                
-                ofRandom(2, 200),
-                ofRandom(2, 200),
-                ofRandom(2, 200),
-                ofRandom(2, 200),
-                ofRandom(2, 200),
-                &globalSlow,
-                
-            1,
-                ofColor::fromHsb(ofRandom(255), 30, 222, 180)
-                ));
+                                  ofVec3f(ofRandom(-200,200), ofRandom(-200,200), ofRandom(-200,200)),
+                                  ofVec3f( ofRandom(-3,3), ofRandom(-3,3), ofRandom(-3,3)),
+                                  ofRandom(2,200),
+                                  ofRandom(2, 200),
+                                  ofRandom(2, 200),
+                                  ofRandom(2, 200),
+                                  ofRandom(2, 200),
+                                  
+                                  ofRandom(-15, 200),
+                                  ofRandom(-15, 200),
+                                  
+                                  ofRandom(2, 20),
+                                  ofRandom(-30, 60),
+                                  
+                                  ofRandom(2, 200),
+                                  ofRandom(2, 200),
+                                  ofRandom(2, 200),
+                                  ofRandom(2, 200),
+                                  ofRandom(2, 200),
+                                  
+                                  ofRandom(2, 20),
+                                  ofRandom(-30, 60),
+                                  
+                                  ofRandom(2, 200),
+                                  ofRandom(2, 200),
+                                  ofRandom(2, 200),
+                                  ofRandom(2, 200),
+                                  ofRandom(2, 200),
+                                  &globalSlow,
+                                  
+                                  randomScale,
+                                  ofColor::fromHsb(ofRandom(255), 30, 222, 180)
+                                  ));
         
     }
     
     wind = ofVec3f(0,0,0);
- 
+    
     windforce = 0.1;
     
     //gui setup
@@ -120,38 +131,38 @@ void testApp::setup(){
     
     gui->addMinimalSlider ("VelSlow", 0.80, 1.2, 1.0);
     gui->addMinimalSlider("WindForce", 0.0, 1.0, 0.1);
-//    gui->addMinimalSlider("HeadFrontH", 0.0, 100.0, 50 );
-//    gui->addMinimalSlider("HeadBackW", 0.0, 100.0, 50);
-//    gui->addMinimalSlider("HeadBackH", 0.0, 100.0, 50);
-//    
-//    gui->addSpacer(0, 12);
-//    
-//    gui->addMinimalSlider("BodyToHeadDia", 0.0, 100.0, 50);
-//    gui->addMinimalSlider("BodyToHeadDist", 0.0, 100.0, 50);
-//    
-//    gui->addSpacer(0, 12);
-//    
-//    gui->addMinimalSlider("BodyLen", 0.0, 100.0, 50);
-//    gui->addMinimalSlider("BodyFrontW", 0.0, 100.0, 50);
-//    gui->addMinimalSlider("BodyFrontH", 0.0, 100.0, 50);
-//    gui->addMinimalSlider("BodyBackW", 0.0, 100.0, 50);
-//    gui->addMinimalSlider("BodyBackH", 0.0, 100.0, 50);
-//    
-//    gui->addSpacer(0, 12);
-//    
-//    gui->addMinimalSlider("BodyToTailDia", 0.0, 100.0, 50);
-//    gui->addMinimalSlider("BodyToTailDist", 0.0, 100.0, 50);
-//    
-//    gui->addSpacer(0, 12);
-//    
-//    gui->addMinimalSlider("TailLen", 0.0, 100.0, 50);
-//    gui->addMinimalSlider("TailFrontW", 0.0, 100.0, 50);
-//    gui->addMinimalSlider("TailFrontH", 0.0, 100.0, 50);
-//    gui->addMinimalSlider("TailBackW", 0.0, 100.0, 50);
-//    gui->addMinimalSlider("TailBackH", 0.0, 100.0, 50);
-//    
-//    gui->addMinimalSlider("RadiusX", -PI/4, PI/4, 0.0);
-   // gui->addMinimalSlider("RadiusY", -PI/4, PI/4, 0.0);
+    //    gui->addMinimalSlider("HeadFrontH", 0.0, 100.0, 50 );
+    //    gui->addMinimalSlider("HeadBackW", 0.0, 100.0, 50);
+    //    gui->addMinimalSlider("HeadBackH", 0.0, 100.0, 50);
+    //
+    //    gui->addSpacer(0, 12);
+    //
+    //    gui->addMinimalSlider("BodyToHeadDia", 0.0, 100.0, 50);
+    //    gui->addMinimalSlider("BodyToHeadDist", 0.0, 100.0, 50);
+    //
+    //    gui->addSpacer(0, 12);
+    //
+    //    gui->addMinimalSlider("BodyLen", 0.0, 100.0, 50);
+    //    gui->addMinimalSlider("BodyFrontW", 0.0, 100.0, 50);
+    //    gui->addMinimalSlider("BodyFrontH", 0.0, 100.0, 50);
+    //    gui->addMinimalSlider("BodyBackW", 0.0, 100.0, 50);
+    //    gui->addMinimalSlider("BodyBackH", 0.0, 100.0, 50);
+    //
+    //    gui->addSpacer(0, 12);
+    //
+    //    gui->addMinimalSlider("BodyToTailDia", 0.0, 100.0, 50);
+    //    gui->addMinimalSlider("BodyToTailDist", 0.0, 100.0, 50);
+    //
+    //    gui->addSpacer(0, 12);
+    //
+    //    gui->addMinimalSlider("TailLen", 0.0, 100.0, 50);
+    //    gui->addMinimalSlider("TailFrontW", 0.0, 100.0, 50);
+    //    gui->addMinimalSlider("TailFrontH", 0.0, 100.0, 50);
+    //    gui->addMinimalSlider("TailBackW", 0.0, 100.0, 50);
+    //    gui->addMinimalSlider("TailBackH", 0.0, 100.0, 50);
+    //
+    //    gui->addMinimalSlider("RadiusX", -PI/4, PI/4, 0.0);
+    // gui->addMinimalSlider("RadiusY", -PI/4, PI/4, 0.0);
     // gui->addMinimalSlider("Arc", 0, 360, arc);
     // gui->addMinimalSlider("InnerRadius", 0, 500, innerR);
     // gui->addMinimalSlider("OuterRadius", 0, 500, outerR);
@@ -159,7 +170,7 @@ void testApp::setup(){
     // gui->addMinimalSlider("Channel", 1, 16, channel);
     
     ofAddListener(gui->newGUIEvent,this,&testApp::guiEvent);
-  //  gui->disable();
+    //  gui->disable();
 }
 
 //--------------------------------------------------------------
@@ -172,7 +183,8 @@ void testApp::update(){
     
     for (int i =0; i < animals.size(); i++) {
         animals[i].addForce(wind);
-       // animals[i].addForce(ofVec3f(0,-0.4,0));
+        // animals[i].addForce(ofVec3f(0,-0.2,0));
+        // animals[i].addForce(ofVec3f(0,-0.4,0));
         animals[i].update();
     }
     
@@ -183,9 +195,9 @@ void testApp::attToCenter(vector<hexapod>* tiere_) {
     //float maxDist = 1000*1000*1000*1000;
     
     for (int i =0; i < tiere_->size(); i++) {
-            
-            ofVec3f dir = tiere_->at(i).location;
-            dir - center;
+        
+        ofVec3f dir = tiere_->at(i).location;
+        dir - center;
         float distToCen = dir.length();
         
         if (distToCen > 1800) {
@@ -237,11 +249,11 @@ void testApp::draw(){
     ofColor a2 = ofColor::fromHsb(120, 180, 70);
     ofBackgroundGradient(a1 * 0.6, a2* 0.4);
     
-        
+    
     cam.begin();
     // light.draw();
     // center.draw();
-     //cSystem();
+    cSystem();
     
     for (int i =0; i < animals.size(); i++) {
         animals[i].draw();
@@ -255,8 +267,8 @@ void testApp::draw(){
     string fpsStr = "fps: "+ofToString(ofGetFrameRate(), 2);
     ofDrawBitmapString(fpsStr, ofGetWidth()-100,100);
     
-   // string windStr = "wind: "+ ofToString(wind.x);
-   // ofDrawBitmapString(windStr, ofGetWidth()-100,200);
+    // string windStr = "wind: "+ ofToString(wind.x);
+    // ofDrawBitmapString(windStr, ofGetWidth()-100,200);
 }
 
 //--------------------------------------------------------------
@@ -324,17 +336,16 @@ void testApp::guiEvent(ofxUIEventArgs &e) {
 	{
 		ofxUISlider *rslider = (ofxUISlider *) e.widget;
         for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].velSlow = rslider->getScaledValue() ;
+            globalSlow = rslider->getScaledValue() ;
         }
 	}
     
     else if (name == "WindForce")
 	{
 		ofxUISlider *rslider = (ofxUISlider *) e.widget;
-                    
-           windforce = rslider->getScaledValue();
-      
+        
+        windforce = rslider->getScaledValue();
+        
 	}
     
     else if (name == "HeadFrontH")
@@ -555,15 +566,15 @@ void testApp::cSystem() {
 
 void testApp::updateWind() {
     
-
+    
     //updateWind
     float t = ( ofGetElapsedTimef())*0.1 ;
     
     wind.x = ofSignedNoise(t,0,0);
-   wind.y = ofSignedNoise(0,t,0);
+    wind.y = ofSignedNoise(0,t,0);
     wind.z = ofSignedNoise(0,0,t);
     
     wind*=windforce;
     
- 
+    
 }
