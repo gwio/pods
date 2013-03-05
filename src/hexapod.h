@@ -19,7 +19,7 @@ public:
      */
     //Constructor
     hexapod(ofVec3f,ofVec3f, float, float, float, float, float, float, float, float, float, float, float, float,
-            float, float, float, float, float, float, float, float, float, float*, float, ofColor
+            float, float, float, float, float, float, float, float, float, float*, float, ofColor, ofVec3f*
             );
     //----------------------------------------------
     
@@ -38,12 +38,20 @@ public:
     //accleration
     ofVec3f acc;
     float mass;
-   
+    
+    //buffers
+    ofVec3f akLocation;
+    ofVec3f akVel;
+    
+    //location and velocity buffer
+    deque<ofVec3f> pathVertices;
+    deque<ofVec3f> velPath;
+    int bufferSize;
     
     //global Slowdown
     float* velSlow;
     
-    
+    ofVec3f* wind;
     //////////Form__________________________________
     //size
     float scale;
@@ -51,6 +59,12 @@ public:
     vector<ofVec3f> bodyCenter, bodyHead, bodyTail, wings;
     //Meshes
     ofMesh meshBody, meshHead, meshTail, wingsVertexUP, wingsVertexDOWN;
+    
+    
+        
+    //trail
+    deque<ofVec3f> trailPoints;
+    ofMesh trail;
     
     
     //mesh description
@@ -81,7 +95,7 @@ public:
     float tailLen ;
     float tailOffset ;
     
-    float farbe;
+    ofColor farbe;
     
     float radiusXScale;
     float radiusYScale;
@@ -105,14 +119,17 @@ public:
     void setWings();
     
     //motion______
-    void updateMeshRadiusX(vector<ofVec3f>* , vector<ofVec3f>* , vector<ofVec3f>*);
-    void updateMeshRadiusY(vector<ofVec3f>* , vector<ofVec3f>* , vector<ofVec3f>* );
-    void rotateToNormal();
+    void translateMeshPoints();
+    void rotateToNormal(ofVec3f);
     void slowDown();
     void addForce(ofVec3f);
     
+    
+    
     ///experimental
     
+    float grow;
+
     
 };
 #endif

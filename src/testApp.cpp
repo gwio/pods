@@ -1,7 +1,7 @@
 #include "testApp.h"
 
 
-#define PODS 50
+#define PODS 65
 
 
 //--------------------------------------------------------------
@@ -12,8 +12,9 @@ void testApp::setup(){
     ofEnableLighting();
     ofEnableAlphaBlending();
     ofEnableSmoothing();
+    ofSetVerticalSync(true);
     ofEnableBlendMode(ofBlendMode(OF_BLENDMODE_ALPHA));
-    material.setShininess(10);
+    material.setShininess(40);
     material.setAmbientColor(125);
     material.setDiffuseColor(30);
     material.setSpecularColor(ofColor(161,111,111));
@@ -24,7 +25,7 @@ void testApp::setup(){
     light.setSpotlight();
     light.setSpotlightCutOff(50);
     light.setSpotConcentration(10);
-    light.setAmbientColor(ofColor::fromHsb(190, 240, 170));
+    light.setAmbientColor(ofColor::fromHsb(30, 240, 170));
     light.setDiffuseColor(ofColor(33,55,55));
     light.setSpecularColor(ofColor(120,120,120));
     light.setPosition(0,800,0);
@@ -32,25 +33,29 @@ void testApp::setup(){
     
     light2.enable();
     
-    light2.setAmbientColor(ofColor::fromHsb(140, 230, 130));
+    light2.setAmbientColor(ofColor::fromHsb(25, 230, 130));
     light2.setDiffuseColor(ofColor(44,44,77));
     light2.setSpecularColor(ofColor(70,70,70));
-    light2.setPosition(0,-100,0);
+    light2.setPosition(0,-300,0);
     
     
-    cam.setFarClip(20000);
-    cam.setNearClip(100);
+    cam.setFarClip(30000);
+    cam.setNearClip(10);
     // cam.setFov();
     
     
     cam.setDistance(100);
-    cam.setPosition(0, 0, +1000);
+    cam.setPosition(0, 0, 1000);
     
-    cam.lookAt( ofVec3f(0,0,0));
+    // cam.lookAt( ofVec3f(0,0,0));
     
     
     center = ofVec3f(0,0,0);
     globalSlow = 1.0;
+    
+    
+    
+    
     /*
      Constructor defintion ;)
      ofVec3f location_, ofVec3f startVel_, float bodyLen_, float bodyFrontH_, float bodyFrontW_,
@@ -63,23 +68,23 @@ void testApp::setup(){
     float randomScale;
     for (int i=0; i < PODS; i++) {
         if ( i%10 == 0) {
-            randomScale = 2.2;
+            randomScale = 1.3;
         } else if (i%6 == 0){
-            randomScale = 0.2;
+            randomScale = 0.3;
             
         } else {
             
-            randomScale = 1;
+            randomScale = 0.9;
         }
         
         animals.push_back(hexapod(
-                                  ofVec3f(ofRandom(-200,200), ofRandom(-200,200), ofRandom(-200,200)),
+                                  ofVec3f(ofRandom(-2000,2000), ofRandom(-2000,2000), ofRandom(-2000,2000)),
                                   ofVec3f( ofRandom(-3,3), ofRandom(-3,3), ofRandom(-3,3)),
-                                  ofRandom(2,200),
-                                  ofRandom(2, 200),
-                                  ofRandom(2, 200),
-                                  ofRandom(2, 200),
-                                  ofRandom(2, 200),
+                                  ofRandom(2,300),
+                                  ofRandom(2, 300),
+                                  ofRandom(2, 300),
+                                  ofRandom(2, 300),
+                                  ofRandom(2, 300),
                                   
                                   ofRandom(-15, 200),
                                   ofRandom(-15, 200),
@@ -87,24 +92,25 @@ void testApp::setup(){
                                   ofRandom(2, 20),
                                   ofRandom(-30, 60),
                                   
-                                  ofRandom(2, 200),
-                                  ofRandom(2, 200),
-                                  ofRandom(2, 200),
-                                  ofRandom(2, 200),
-                                  ofRandom(2, 200),
+                                  ofRandom(2, 300),
+                                  ofRandom(2, 300),
+                                  ofRandom(2, 300),
+                                  ofRandom(2, 300),
+                                  ofRandom(2, 300),
                                   
                                   ofRandom(2, 20),
                                   ofRandom(-30, 60),
                                   
-                                  ofRandom(2, 200),
-                                  ofRandom(2, 200),
-                                  ofRandom(2, 200),
-                                  ofRandom(2, 200),
-                                  ofRandom(2, 200),
+                                  ofRandom(2, 300),
+                                  ofRandom(2, 300),
+                                  ofRandom(2, 300),
+                                  ofRandom(2, 300),
+                                  ofRandom(2, 300),
                                   &globalSlow,
                                   
                                   randomScale,
-                                  ofColor::fromHsb(ofRandom(255), 30, 222, 180)
+                                  ofColor::fromHsb(ofRandom(255), 65, 112, 140),
+                                  &wind
                                   ));
         
     }
@@ -131,44 +137,7 @@ void testApp::setup(){
     
     gui->addMinimalSlider ("VelSlow", 0.80, 1.2, 1.0);
     gui->addMinimalSlider("WindForce", 0.0, 1.0, 0.1);
-    //    gui->addMinimalSlider("HeadFrontH", 0.0, 100.0, 50 );
-    //    gui->addMinimalSlider("HeadBackW", 0.0, 100.0, 50);
-    //    gui->addMinimalSlider("HeadBackH", 0.0, 100.0, 50);
-    //
-    //    gui->addSpacer(0, 12);
-    //
-    //    gui->addMinimalSlider("BodyToHeadDia", 0.0, 100.0, 50);
-    //    gui->addMinimalSlider("BodyToHeadDist", 0.0, 100.0, 50);
-    //
-    //    gui->addSpacer(0, 12);
-    //
-    //    gui->addMinimalSlider("BodyLen", 0.0, 100.0, 50);
-    //    gui->addMinimalSlider("BodyFrontW", 0.0, 100.0, 50);
-    //    gui->addMinimalSlider("BodyFrontH", 0.0, 100.0, 50);
-    //    gui->addMinimalSlider("BodyBackW", 0.0, 100.0, 50);
-    //    gui->addMinimalSlider("BodyBackH", 0.0, 100.0, 50);
-    //
-    //    gui->addSpacer(0, 12);
-    //
-    //    gui->addMinimalSlider("BodyToTailDia", 0.0, 100.0, 50);
-    //    gui->addMinimalSlider("BodyToTailDist", 0.0, 100.0, 50);
-    //
-    //    gui->addSpacer(0, 12);
-    //
-    //    gui->addMinimalSlider("TailLen", 0.0, 100.0, 50);
-    //    gui->addMinimalSlider("TailFrontW", 0.0, 100.0, 50);
-    //    gui->addMinimalSlider("TailFrontH", 0.0, 100.0, 50);
-    //    gui->addMinimalSlider("TailBackW", 0.0, 100.0, 50);
-    //    gui->addMinimalSlider("TailBackH", 0.0, 100.0, 50);
-    //
-    //    gui->addMinimalSlider("RadiusX", -PI/4, PI/4, 0.0);
-    // gui->addMinimalSlider("RadiusY", -PI/4, PI/4, 0.0);
-    // gui->addMinimalSlider("Arc", 0, 360, arc);
-    // gui->addMinimalSlider("InnerRadius", 0, 500, innerR);
-    // gui->addMinimalSlider("OuterRadius", 0, 500, outerR);
-    // gui->addMinimalSlider("Speed", -5.0, 5.0, rotSpeed);
-    // gui->addMinimalSlider("Channel", 1, 16, channel);
-    
+     
     ofAddListener(gui->newGUIEvent,this,&testApp::guiEvent);
     //  gui->disable();
 }
@@ -183,8 +152,6 @@ void testApp::update(){
     
     for (int i =0; i < animals.size(); i++) {
         animals[i].addForce(wind);
-        // animals[i].addForce(ofVec3f(0,-0.2,0));
-        // animals[i].addForce(ofVec3f(0,-0.4,0));
         animals[i].update();
     }
     
@@ -200,10 +167,10 @@ void testApp::attToCenter(vector<hexapod>* tiere_) {
         dir - center;
         float distToCen = dir.length();
         
-        if (distToCen > 1800) {
+        if (distToCen > 2700) {
             dir.normalize();
             dir*=-1;
-            dir*=((distToCen-1800)*0.00019);
+            dir*=((distToCen-2700)*0.00019);
             tiere_->at(i).addForce(dir);
             
         }
@@ -220,12 +187,12 @@ void testApp::seperation(vector<hexapod>* tiere_) {
             if ( i != j) {
                 ofVec3f dir = tiere_->at(i).location;
                 dir-= tiere_->at(j).location;
-                float dia = ((tiere_->at(i).lenTotal)  + ((tiere_->at(j).lenTotal))  )*6000;
+                float dia = ((tiere_->at(i).lenTotal)  + ((tiere_->at(j).lenTotal))  )*6500;
                 float dist = dir.lengthSquared();
                 
                 if ( dist < 125000+dia) {
                     
-                    float force = (((125000+dia)/ dist) -1) *0.005;
+                    float force = (((125000+dia)/ dist) -1) *0.008;
                     dir.normalize();
                     dir*=force;
                     tiere_->at(i).addForce(dir);
@@ -245,15 +212,16 @@ void testApp::draw(){
     glEnable(GL_DEPTH_TEST);
     ofEnableLighting();
     material.begin();
-    ofColor a1 = ofColor::fromHsb(170, 220, 50);
-    ofColor a2 = ofColor::fromHsb(120, 180, 70);
+    ofColor a1 = ofColor::fromHsb(40, 110, 30);
+    ofColor a2 = ofColor::fromHsb(170, 130, 180);
+    
     ofBackgroundGradient(a1 * 0.6, a2* 0.4);
-    
-    
     cam.begin();
+    
+    
     // light.draw();
     // center.draw();
-    cSystem();
+    // cSystem();
     
     for (int i =0; i < animals.size(); i++) {
         animals[i].draw();
@@ -261,14 +229,13 @@ void testApp::draw(){
     
     
     cam.end();
+    
     material.end();
     glEnd();
     
-    string fpsStr = "fps: "+ofToString(ofGetFrameRate(), 2);
-    ofDrawBitmapString(fpsStr, ofGetWidth()-100,100);
-    
-    // string windStr = "wind: "+ ofToString(wind.x);
-    // ofDrawBitmapString(windStr, ofGetWidth()-100,200);
+        string fpsStr = "fps: "+ofToString(ofGetFrameRate(), 2);
+        ofDrawBitmapString(fpsStr, ofGetWidth()-100,100);
+   
 }
 
 //--------------------------------------------------------------
@@ -283,7 +250,58 @@ void testApp::keyPressed(int key){
             break;
         default:
             break;
+            
+        case 'f':
+            ofToggleFullscreen();
+            break;
+            
+        case 'r':
+            
+            animals.clear();
+            
+            for (int i=0; i < PODS; i++) {
+                
+                animals.push_back(hexapod(
+                                          ofVec3f(ofRandom(-200,200), ofRandom(-200,200), ofRandom(-200,200)),
+                                          ofVec3f( ofRandom(-3,3), ofRandom(-3,3), ofRandom(-3,3)),
+                                          ofRandom(2,200),
+                                          ofRandom(2, 200),
+                                          ofRandom(2, 200),
+                                          ofRandom(2, 200),
+                                          ofRandom(2, 200),
+                                          
+                                          ofRandom(-15, 200),
+                                          ofRandom(-15, 200),
+                                          
+                                          ofRandom(2, 20),
+                                          ofRandom(-30, 60),
+                                          
+                                          ofRandom(2, 200),
+                                          ofRandom(2, 200),
+                                          ofRandom(2, 200),
+                                          ofRandom(2, 200),
+                                          ofRandom(2, 200),
+                                          
+                                          ofRandom(2, 20),
+                                          ofRandom(-30, 60),
+                                          
+                                          ofRandom(2, 200),
+                                          ofRandom(2, 200),
+                                          ofRandom(2, 200),
+                                          ofRandom(2, 200),
+                                          ofRandom(2, 200),
+                                          &globalSlow,
+                                          
+                                          0.4,
+                                          ofColor::fromHsb(ofRandom(255), 65, 112, 140),
+                                          
+                                          &wind
+                                          ));
+                
+                
+            }
     }
+    
 }
 
 //--------------------------------------------------------------
@@ -313,6 +331,8 @@ void testApp::mouseReleased(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::windowResized(int w, int h){
+    
+    
     
 }
 
@@ -348,195 +368,7 @@ void testApp::guiEvent(ofxUIEventArgs &e) {
         
 	}
     
-    else if (name == "HeadFrontH")
-    {
-        ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].headFrontH = rslider->getScaledValue() ;
-            
-        }
-    }
-    
-    else if (name == "HeadBackW")
-    {
-        ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].headBackW = rslider->getScaledValue() ;
-            
-        }
-    }
-    
-    else if (name == "HeadBackH")
-    {
-        ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].headBackH = rslider->getScaledValue() ;
-            
-        }
-    }
-    
-    else if (name == "BodyToHeadDia")
-    {
-        ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].bodyToHeadDia = rslider->getScaledValue() ;
-            
-        }
-    }
-    
-    else if (name == "BodyToHeadDist")
-    {
-        ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].bodyToHeadDist = rslider->getScaledValue() ;
-            
-        }
-    }
-    
-    else if(name == "BodyLen")
-	{
-		ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].bodyLen = rslider->getScaledValue() ;
-            
-        }
-	}
-    
-    else if (name == "BodyFrontW")
-	{
-		ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].bodyFrontW = rslider->getScaledValue() ;
-            
-        }
-	}
-    
-    else if (name == "BodyFrontH")
-    {
-        ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].bodyFrontH = rslider->getScaledValue() ;
-            
-        }
-    }
-    
-    else if (name == "BodyBackW")
-    {
-        ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].bodyBackW = rslider->getScaledValue() ;
-            
-        }
-    }
-    
-    else if (name == "BodyBackH")
-    {
-        ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].bodyBackH = rslider->getScaledValue() ;
-            
-        }
-    }
-    
-    else if (name == "BodyToTailDia")
-    {
-        ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].bodyToTailDia = rslider->getScaledValue() ;
-            
-        }
-    }
-    
-    else if (name == "BodyToTailDist")
-    {
-        ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].bodyToTailDist = rslider->getScaledValue() ;
-            
-        }
-    }
-    else if(name == "TailLen")
-	{
-		ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].tailLen = rslider->getScaledValue() ;
-            
-        }
-	}
-    
-    else if (name == "TailFrontW")
-	{
-		ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].tailFrontW = rslider->getScaledValue() ;
-            
-        }
-	}
-    
-    else if (name == "TailFrontH")
-    {
-        ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].tailFrontH = rslider->getScaledValue() ;
-            
-        }
-    }
-    
-    else if (name == "TailBackW")
-    {
-        ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].tailBackW = rslider->getScaledValue() ;
-            
-        }
-    }
-    
-    else if (name == "TailBackH")
-    {
-        ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].tailBackH = rslider->getScaledValue() ;
-            
-        }
-    }
-    
-    else if (name == "RadiusY")
-    {
-        ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].radiusYScale = rslider->getScaledValue() ;
-            
-        }
-    }
-    
-    else if (name == "RadiusX")
-    {
-        ofxUISlider *rslider = (ofxUISlider *) e.widget;
-        for(int i=0; i < animals.size(); i++) {
-            animals[i].initMeshPoints();
-            animals[i].radiusXScale = rslider->getScaledValue() ;
-            
-        }
-    }
-    
+        
     
 }
 

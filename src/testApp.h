@@ -4,6 +4,7 @@
 #include "hexapod.h"
 #include "ofxXmlSettings.h"
 #include "ofxUI.h"
+#include "ofxPostProcessing.h"
 
 
 class testApp : public ofBaseApp{
@@ -40,7 +41,6 @@ class testApp : public ofBaseApp{
     //forces
     float noiseInc, noiseX, noiseY, noiseZ;
    
-    
     void updateWind();
     
     void attToCenter(vector<hexapod>*);

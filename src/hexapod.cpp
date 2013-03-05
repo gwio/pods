@@ -8,7 +8,7 @@ hexapod::hexapod(ofVec3f location_, ofVec3f startVel_, float bodyLen_, float bod
                  float headFrontDist_,float headLen_, float headFrontW_,
                  float headFrontH_, float headBackW_, float headBackH_,float tailBackDia_, float tailBackDist_,
                  float tailLen_, float tailFrontW_, float tailFrontH_,
-                 float tailBackW_, float tailBackH_, float* globalSlow_, float scale_, ofColor farbe_) {
+                 float tailBackW_, float tailBackH_, float* globalSlow_, float scale_, ofColor farbe_, ofVec3f* wind_) {
     
     
     //translate Position
@@ -79,12 +79,24 @@ hexapod::hexapod(ofVec3f location_, ofVec3f startVel_, float bodyLen_, float bod
     
     mass = scale_ ;
     
-    farbe = ofRandom(255);
+    farbe = farbe_;
     velSlow = globalSlow_;
     
     initMeshPoints();
     scaleMesh(scale_);
     updateMesh();
+    
+    trail.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
+    
+    wind = wind_;
+    
+    grow = scale_;
+    
+    bufferSize = 40;
+    for (int i = 0; i< bufferSize; i++) {
+        pathVertices.push_back(location);
+        velPath.push_back(vel);
+    }
     
     
 }
@@ -96,21 +108,67 @@ void hexapod::addForce(ofVec3f force_) {
 }
 
 void hexapod::update() {
+    
+    // get new mesh points and scale
     initMeshPoints();
+    //translate to the modelmatrix
+    translateMeshPoints();
+    //create the meshes
     updateMesh();
     
     
+    
     vel += acc;
-    
-    
     slowDown();
     location += vel;
-    transPoint.set(location.x, location.y, location.z);
+    
+    // add the current position and velocity to stacks
+    pathVertices.push_back(location);
+    velPath.push_back(vel);
+    
+    akLocation = pathVertices[pathVertices.size()/2];
+    akVel = velPath[velPath.size()/2];
+    
+    // if we have too many vertices in the deque, get rid of the oldest ones
+	while(pathVertices.size() > bufferSize) {
+		pathVertices.pop_front();
+	}
+    while(velPath.size() > bufferSize) {
+		velPath.pop_front();
+	}
+    
+    while(trailPoints.size() > 30) {
+		trailPoints.pop_front();
+	}
+    
+    if (ofGetFrameNum()%8 == 0) {
+        trailPoints.push_back(bodyTail[20]);
+        // trailPoints.push_back(pathVertices[0]);
+    }
     
     
+    trail.clear();
+    for (int i=0; i < trailPoints.size(); i++) {
+        trailPoints[i] += *wind*16*(i/4)+1;
+        trailPoints[i].y += -3;
+        trailPoints[i].z += ofRandom(-2,2);
+        
+        trail.addVertex(trailPoints[i]);
+        
+        
+        trail.addColor(ofColor::fromHsb(farbe.getHue(),farbe.getSaturation()+20,farbe.getBrightness(), i*3));
+    }
+    
+    setNormals(&trail);
+    
+    //reset accleration
     acc*=0;
     
+    
+    grow = sin ((ofGetElapsedTimef()/scale)*3) +1;
 }
+
+
 
 void hexapod::initMeshPoints() {
     
@@ -123,7 +181,12 @@ void hexapod::initMeshPoints() {
     
     headOffset = (bodyLen/2) +(bodyToHeadDist) + (headLen/2);
     tailOffset = (bodyLen/2) +(bodyToTailDist) + (tailLen/2);
-    lenTotal = headLen+bodyLen+tailLen+bodyToHeadDist+bodyToTailDist;
+    lenTotal = headLen+bodyLen+tailLen+(bodyToHeadDist)+(bodyToTailDist)+headFrontDist+tailBackDist;
+    
+    
+    float tempA = bodyBackW;
+    bodyBackW*= grow;
+    
     
     //_________________________________________________________________________________________________ //bodyHead
     
@@ -230,12 +293,97 @@ void hexapod::initMeshPoints() {
     bodyTail.push_back( ofVec3f( bodyCenterPos.x + (tailBackDia), bodyCenterPos.y - (tailBackDia), tailOffset + bodyCenterPos.z + (tailBackDist) + (tailLen/2) ) );
     bodyTail.push_back( ofVec3f( bodyCenterPos.x - (tailBackDia), bodyCenterPos.y - (tailBackDia), tailOffset + bodyCenterPos.z + (tailBackDist) + (tailLen/2) ) );
     
-    // add x,z and y,z deformation
-    updateMeshRadiusX(&bodyHead, &bodyCenter, &bodyTail);
-    updateMeshRadiusY(&bodyHead, &bodyCenter, &bodyTail);
-    
     scaleMesh(scale);
     
+    bodyBackW = tempA;
+    //bodyBackH = tempB;
+}
+
+void hexapod::translateMeshPoints() {
+    
+    //head _____
+    
+    ofPushMatrix();
+    
+    ofVec3f tempAngle = akLocation-location;
+    
+    ofTranslate(ofGetWidth()/2, ofGetHeight()/2, ofGetHeight() );
+    ofTranslate(akLocation.x, akLocation.y, akLocation.z);
+    
+    rotateToNormal(vel);
+    
+    GLfloat m[16];
+    glGetFloatv(GL_MODELVIEW_MATRIX, m);
+    ofMatrix4x4 mat = m;
+    
+    
+    for (int i= 0; i < bodyHead.size()-4; i++) {
+        bodyHead[i] = bodyHead[i]*mat;
+        bodyHead[i].y *= -1;
+        
+    }
+    
+    ofPopMatrix();
+    
+    //body_____________
+    
+    ofPushMatrix();
+    ofTranslate(ofGetWidth()/2, ofGetHeight()/2, ofGetHeight() );
+    ofTranslate(akLocation.x, akLocation.y, akLocation.z);
+    rotateToNormal(akVel);
+    
+    
+    glGetFloatv(GL_MODELVIEW_MATRIX, m);
+    mat = m;
+    
+    for (int i= 0; i < bodyCenter.size(); i++) {
+        bodyCenter[i] = bodyCenter[i]*mat;
+        bodyCenter[i].y *= -1;
+        
+    }
+    
+    for (int i= bodyHead.size()-4; i < bodyHead.size(); i++) {
+        bodyHead[i] = bodyHead[i]*mat;
+        bodyHead[i].y *= -1;
+    }
+    
+    for (int i= 16; i <= 19; i++) {
+        bodyTail[i] = bodyTail[i]*mat;
+        bodyTail[i].y *= -1;
+    }
+    
+    ofPopMatrix();
+    
+    
+    //tail______
+    
+    ofPushMatrix();
+    ofTranslate(ofGetWidth()/2, ofGetHeight()/2, ofGetHeight() );
+    ofTranslate(akLocation.x, akLocation.y, akLocation.z);
+    
+    
+    rotateToNormal(velPath[0]);
+    
+    // rotateToNormal(akVel);
+    
+    glGetFloatv(GL_MODELVIEW_MATRIX, m);
+    mat = m;
+    
+    for (int i= 0; i <= 15; i++) {
+        bodyTail[i] = bodyTail[i]*mat;
+        bodyTail[i].y *= -1;
+    }
+    
+    for (int i= 20; i <= bodyTail.size()-1; i++) {
+        bodyTail[i] = bodyTail[i]*mat;
+        bodyTail[i].y *= -1;
+    }
+    
+    
+    
+    
+    
+    ofPopMatrix();
     
 }
 
@@ -853,7 +1001,7 @@ void hexapod::scaleMesh(float scale_) {
     scale = scale_;
     lenTotal*= scale;
     mass = scale ;
-    updateMesh();
+    
 }
 
 void hexapod::setNormals(ofMesh* mesh_) {
@@ -883,110 +1031,9 @@ void hexapod::setColors(ofMesh* mesh_) {
     
     for (int i = 0; i < mesh_->getNumVertices(); i+=3) {
         
-        mesh_->addColor( ofColor::fromHsb( farbe, 45, 211, 115)) ;
-        mesh_->addColor( ofColor::fromHsb( farbe, 45, 211, 115)) ;
-        mesh_->addColor( ofColor::fromHsb( farbe, 45, 211, 115)) ;
-    }
-    
-}
-
-void hexapod::updateMeshRadiusY( vector<ofVec3f>* bodyHead_, vector<ofVec3f>* bodyCenter_, vector<ofVec3f>* bodyTail_) {
-    
-    for (int i = 0; i < bodyHead_->size(); i++) {
-        ofVec3f in = bodyHead_->at(i);
-        float theta =  in.x/ in.length();
-        //   float thetha2 = in.length();
-        in.x = -sin(theta+radiusYScale)*in.z;
-        in.z = cos(theta+radiusYScale)*in.z;
-        bodyHead_->at(i).x = in.x;
-        bodyHead_->at(i).y = in.y;
-        bodyHead_->at(i).z = in.z;
-    }
-    
-    for (int i = 0; i < bodyCenter_->size(); i++) {
-        if (  abs(bodyCenter_->at(i).z) > (bodyLen/2)) {
-            ofVec3f in = bodyCenter_->at(i);
-            if (in.z < 0) {
-                float theta =  in.x/ in.length();
-                //   float thetha2 = in.length();
-                in.x = -sin(theta+radiusYScale)*in.z;
-                in.z = cos(theta+radiusYScale)*in.z;
-            } else {
-                float theta =  in.x/ in.length();
-                //   float thetha2 = in.length();
-                in.x = sin(theta+radiusYScale)*in.z;
-                in.z = cos(theta+radiusYScale)*abs(in.z);
-            }
-            bodyCenter_->at(i).x = in.x;
-            bodyCenter_->at(i).y = in.y;
-            bodyCenter_->at(i).z = in.z;
-        }
-    }
-    
-    for (int i = 0; i < bodyTail_->size(); i++) {
-        ofVec3f in = bodyTail_->at(i);
-        float theta =  in.x/ in.length();
-        //   float thetha2 = in.length();
-        in.x = sin(theta+radiusYScale)*in.z;
-        in.z = cos(theta+radiusYScale)*abs(in.z);
-        bodyTail_->at(i).x = in.x;
-        bodyTail_->at(i).y = in.y;
-        bodyTail_->at(i).z = in.z;
-    }
-}
-
-void hexapod::updateMeshRadiusX(vector<ofVec3f>* bodyHead_, vector<ofVec3f>* bodyCenter_, vector<ofVec3f>* bodyTail_) {
-    
-    for (int i = 0; i < bodyHead_->size(); i++) {
-        ofVec3f in = bodyHead_->at(i);
-        
-        float theta =  in.y/ in.length();
-        
-        //   float thetha2 = in.length();
-        in.y = -sin(theta+radiusXScale)*in.z;
-        in.z = cos(theta+radiusXScale)*in.z;
-        
-        bodyHead_->at(i).x = in.x;
-        bodyHead_->at(i).y = in.y;
-        bodyHead_->at(i).z = in.z;
-    }
-    
-    for (int i = 0; i < bodyCenter_->size(); i++) {
-        if (  abs(bodyCenter_->at(i).z) > (bodyLen/2)) {
-            ofVec3f in = bodyCenter_->at(i);
-            
-            if (in.z < 0) {
-                float theta =  in.y/ in.length();
-                //   float thetha2 = in.length();
-                
-                in.y = -sin(theta+radiusXScale)*in.z;
-                in.z = cos(theta+radiusXScale)*in.z;
-            } else {
-                float theta =  in.y/ in.length();
-                //   float thetha2 = in.length();
-                
-                in.y = sin(theta+radiusXScale)*in.z;
-                in.z = cos(theta+radiusXScale)*abs(in.z);
-            }
-            
-            bodyCenter_->at(i).x = in.x;
-            bodyCenter_->at(i).y = in.y;
-            bodyCenter_->at(i).z = in.z;
-        }
-    }
-    
-    for (int i = 0; i < bodyTail_->size(); i++) {
-        ofVec3f in = bodyTail_->at(i);
-        
-        float theta =  in.y/ in.length();
-        
-        //   float thetha2 = in.length();
-        in.y = sin(theta+radiusXScale)*in.z;
-        in.z = cos(theta+radiusXScale)*abs(in.z);
-        
-        bodyTail_->at(i).x = in.x;
-        bodyTail_->at(i).y = in.y;
-        bodyTail_->at(i).z = in.z;
+        mesh_->addColor( farbe) ;
+        mesh_->addColor( farbe) ;
+        mesh_->addColor( farbe) ;
     }
     
 }
@@ -995,14 +1042,17 @@ void hexapod::updateMeshRadiusX(vector<ofVec3f>* bodyHead_, vector<ofVec3f>* bod
 
 void hexapod::draw() {
     
-    ofPushMatrix();
     
-    ofTranslate(location.x, location.y, location.z);
-    
-    
-    
-    
-    
+    //    ofMesh PT;
+    //    PT.setMode(OF_PRIMITIVE_LINE_STRIP);
+    //    for (int i = 0; i < pathVertices.size(); i++) {
+    //
+    //       // ofVec3f temp
+    //        PT.addVertex(pathVertices[i]);
+    //        PT.addColor(ofColor::fromHsb(farbe.getHex(), 255, 255));
+    //    }
+    //
+    //    PT.drawFaces();
     
     meshBody.setMode(OF_PRIMITIVE_TRIANGLES);
     meshBody.enableColors();
@@ -1016,26 +1066,17 @@ void hexapod::draw() {
     meshTail.enableColors();
     meshTail.enableNormals();
     
-    rotateToNormal();
-    
-    meshBody.drawFaces();
     meshHead.drawFaces();
+    meshBody.drawFaces();
     meshTail.drawFaces();
     
-    meshHead.drawWireframe();
-    meshBody.drawWireframe();
-    meshTail.drawWireframe();
     
+    //    meshHead.drawWireframe();
+    //    meshBody.drawWireframe();
+    //    meshTail.drawWireframe();
     
-    ofPopMatrix();
+    trail.drawFaces();
     
-    
-    
-    
-    
-    
-    
-    //ofLine(location.x, location.y, location.z, location.x+vel.x,location.y+ vel.y,location.z+ vel.z);
 }
 
 void hexapod::drawNormals() {
@@ -1075,19 +1116,21 @@ void hexapod::drawNormals() {
     ofPopMatrix();
 }
 
-void hexapod::rotateToNormal() {
+void hexapod::rotateToNormal(ofVec3f normal_) {
     
     
     float rotAm;
     ofVec3f rotAngle;
     ofQuaternion rotation;
     ofVec3f axis(0,0,-1);
-    rotation.makeRotate(axis, vel);
+    rotation.makeRotate(axis, normal_);
     rotation.getRotate(rotAm, rotAngle);
     
     ofRotate(rotAm, rotAngle.x, rotAngle.y, rotAngle.z);
     
 }
+
+
 
 void hexapod::slowDown() {
     
@@ -1101,5 +1144,6 @@ void hexapod::slowDown() {
     vel*= *velSlow;
     
 }
+
 
 
