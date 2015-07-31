@@ -1,7 +1,7 @@
 
 
-#ifndef hexapoda_hexapod_h
-#define hexapoda_hexapod_h
+#pragma once
+
 #include "ofMain.h"
 
 
@@ -132,4 +132,4 @@ public:
     
     
 };
-#endif
+

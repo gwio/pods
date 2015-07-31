@@ -173,7 +173,6 @@ void hexapod::update() {
 void hexapod::initMeshPoints() {
     
     
-    
     bodyHead.clear();
     bodyCenter.clear();
     bodyTail.clear();
