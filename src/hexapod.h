@@ -61,7 +61,7 @@ public:
     ofMesh meshBody, meshHead, meshTail, wingsVertexUP, wingsVertexDOWN;
     
     
-        
+    
     //trail
     deque<ofVec3f> trailPoints;
     ofMesh trail;
@@ -129,7 +129,7 @@ public:
     ///experimental
     
     float grow;
-
+    
     
 };
 #endif

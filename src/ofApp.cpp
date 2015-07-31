@@ -1,11 +1,11 @@
-#include "testApp.h"
+#include "ofApp.h"
 
 
 #define PODS 65
 
 
 //--------------------------------------------------------------
-void testApp::setup(){
+void ofApp::setup(){
     glEnable(GL_DEPTH_TEST); //make sure we test depth for 3d
     ofSetFrameRate(60);
     
@@ -137,13 +137,13 @@ void testApp::setup(){
     
     gui->addMinimalSlider ("VelSlow", 0.80, 1.2, 1.0);
     gui->addMinimalSlider("WindForce", 0.0, 1.0, 0.1);
-     
-    ofAddListener(gui->newGUIEvent,this,&testApp::guiEvent);
+    
+    ofAddListener(gui->newGUIEvent,this,&ofApp::guiEvent);
     //  gui->disable();
 }
 
 //--------------------------------------------------------------
-void testApp::update(){
+void ofApp::update(){
     
     updateWind();
     
@@ -158,7 +158,7 @@ void testApp::update(){
     
 }
 
-void testApp::attToCenter(vector<hexapod>* tiere_) {
+void ofApp::attToCenter(vector<hexapod>* tiere_) {
     //float maxDist = 1000*1000*1000*1000;
     
     for (int i =0; i < tiere_->size(); i++) {
@@ -179,7 +179,7 @@ void testApp::attToCenter(vector<hexapod>* tiere_) {
     }
 }
 
-void testApp::seperation(vector<hexapod>* tiere_) {
+void ofApp::seperation(vector<hexapod>* tiere_) {
     
     for (int i = 0; i < tiere_->size(); i++) {
         for (int j= 0; j < tiere_->size(); j++) {
@@ -206,7 +206,7 @@ void testApp::seperation(vector<hexapod>* tiere_) {
     }
 }
 //--------------------------------------------------------------
-void testApp::draw(){
+void ofApp::draw(){
     
     
     glEnable(GL_DEPTH_TEST);
@@ -233,13 +233,13 @@ void testApp::draw(){
     material.end();
     glEnd();
     
-        string fpsStr = "fps: "+ofToString(ofGetFrameRate(), 2);
-        ofDrawBitmapString(fpsStr, ofGetWidth()-100,100);
-   
+    string fpsStr = "fps: "+ofToString(ofGetFrameRate(), 2);
+    ofDrawBitmapString(fpsStr, ofGetWidth()-100,100);
+    
 }
 
 //--------------------------------------------------------------
-void testApp::keyPressed(int key){
+void ofApp::keyPressed(int key){
     switch (key)
     {
         case 'g':
@@ -305,80 +305,80 @@ void testApp::keyPressed(int key){
 }
 
 //--------------------------------------------------------------
-void testApp::keyReleased(int key){
+void ofApp::keyReleased(int key){
     
 }
 
 //--------------------------------------------------------------
-void testApp::mouseMoved(int x, int y ){
+void ofApp::mouseMoved(int x, int y ){
     
 }
 
 //--------------------------------------------------------------
-void testApp::mouseDragged(int x, int y, int button){
+void ofApp::mouseDragged(int x, int y, int button){
     
 }
 
 //--------------------------------------------------------------
-void testApp::mousePressed(int x, int y, int button){
+void ofApp::mousePressed(int x, int y, int button){
     
 }
 
 //--------------------------------------------------------------
-void testApp::mouseReleased(int x, int y, int button){
+void ofApp::mouseReleased(int x, int y, int button){
     
 }
 
 //--------------------------------------------------------------
-void testApp::windowResized(int w, int h){
+void ofApp::windowResized(int w, int h){
     
     
     
 }
 
 //--------------------------------------------------------------
-void testApp::gotMessage(ofMessage msg){
+void ofApp::gotMessage(ofMessage msg){
     
 }
 
 //--------------------------------------------------------------
-void testApp::dragEvent(ofDragInfo dragInfo){
+void ofApp::dragEvent(ofDragInfo dragInfo){
     
 }
 
-void testApp::guiEvent(ofxUIEventArgs &e) {
+void ofApp::guiEvent(ofxUIEventArgs &e) {
     
     string name = e.widget->getName();
-	int kind = e.widget->getKind();
+    int kind = e.widget->getKind();
     
     
     if(name == "VelSlow")
-	{
-		ofxUISlider *rslider = (ofxUISlider *) e.widget;
+    {
+        ofxUISlider *rslider = (ofxUISlider *) e.widget;
         for(int i=0; i < animals.size(); i++) {
             globalSlow = rslider->getScaledValue() ;
         }
-	}
+    }
     
     else if (name == "WindForce")
-	{
-		ofxUISlider *rslider = (ofxUISlider *) e.widget;
+    {
+        ofxUISlider *rslider = (ofxUISlider *) e.widget;
         
         windforce = rslider->getScaledValue();
         
-	}
+    }
     
-        
+    
     
 }
 
-void testApp::exit()
+void ofApp::exit()
 {
     gui->saveSettings("GUI/guiSettings.xml");
     delete gui;
 }
 
-void testApp::cSystem() {
+void ofApp::cSystem() {
     ofPushStyle();
     ofNoFill();
     ofSetColor(255, 0, 0);
@@ -396,7 +396,7 @@ void testApp::cSystem() {
     
 }
 
-void testApp::updateWind() {
+void ofApp::updateWind() {
     
     
     //updateWind

@@ -130,16 +130,16 @@ void hexapod::update() {
     akVel = velPath[velPath.size()/2];
     
     // if we have too many vertices in the deque, get rid of the oldest ones
-	while(pathVertices.size() > bufferSize) {
-		pathVertices.pop_front();
-	}
+    while(pathVertices.size() > bufferSize) {
+        pathVertices.pop_front();
+    }
     while(velPath.size() > bufferSize) {
-		velPath.pop_front();
-	}
+        velPath.pop_front();
+    }
     
     while(trailPoints.size() > 30) {
-		trailPoints.pop_front();
-	}
+        trailPoints.pop_front();
+    }
     
     if (ofGetFrameNum()%8 == 0) {
         trailPoints.push_back(bodyTail[20]);
