@@ -242,14 +242,25 @@ void ofApp::draw(){
 void ofApp::keyPressed(int key){
     switch (key)
     {
+            
+            
+        case 's':
+        {
+            ofImage pix;
+            pix.allocate(ofGetWidth(), ofGetHeight(), OF_IMAGE_COLOR);
+            pix.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
+            pix.saveImage( ofGetTimestampString()+"debug.png");
+        }
+            break;
+            
+            
         case 'g':
         {
             gui->toggleVisible();
             
         }
             break;
-        default:
-            break;
+            
             
         case 'f':
             ofToggleFullscreen();
@@ -294,7 +305,6 @@ void ofApp::keyPressed(int key){
                                           
                                           0.4,
                                           ofColor::fromHsb(ofRandom(255), 65, 112, 140),
-                                          
                                           &wind
                                           ));
                 
